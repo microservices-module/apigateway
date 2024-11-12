@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: apigateway
+  cloud:
+    gateway:
+      routes:
+        # http://localhost:8080/dummy-userms/users
+        - id: usermsid
+          uri: lb://USERMS
+          predicates:
+            - Path= /dummy-userms/**
+          filters:
+            - RewritePath= /dummy-userms/(?<path>.*), /$\{path}
+        # http://localhost:8080/dummy-userms-client/users-client
+        - id: usermsclientid
+          uri: lb://USERMS-CLIENT
+          predicates:
+            - Path= /dummy-userms-client/**
+          filters:
+            - RewritePath= /dummy-userms-client/(?<path>.*), /$\{path}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
